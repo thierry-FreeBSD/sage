@@ -53,4 +53,4 @@ jobs:
             whoami
             env | sort
             sudo pkg install -y devel/py-tox textproc/py-tomli
-            tox -e local-root-freebsd-standard
+            tox -e local-sudo-freebsd-standard
