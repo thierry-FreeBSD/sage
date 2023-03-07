@@ -1,1 +1,1 @@
-tox
+devel/py-tox

@@ -1,1 +1,1 @@
-pari_galdata
+pari-galdata
