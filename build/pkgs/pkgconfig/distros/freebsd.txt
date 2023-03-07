@@ -1,1 +1,1 @@
-pkgconf
+devel/pkgconf
