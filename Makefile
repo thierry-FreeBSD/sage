@@ -27,6 +27,9 @@ start: base-toolchain
 sageruntime: base-toolchain
 	$(MAKE) all-sageruntime
 
+fake:
+	# Just to push something
+
 SAGE_ROOT_LOGS = logs
 
 # The --stop flag below is just a random flag to induce graceful
