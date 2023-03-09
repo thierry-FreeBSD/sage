@@ -157,7 +157,8 @@ case $system:$command in
         [ -n "$system_packages" ] && print_shell_command "apt-cyg install $system_packages"
         ;;
     freebsd*:install)
-        [ -n "$system_packages" ] && print_shell_command "${SUDO}pkg install $system_packages"
+        [ "$YES" = yes ] && options="$options --yes"
+        [ -n "$system_packages" ] && print_shell_command "${SUDO}pkg install $options $system_packages"
         ;;
     nix*:install)
         [ -n "$system_packages" ] && print_shell_command "nix-env --install $system_packages"
