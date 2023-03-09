@@ -52,5 +52,5 @@ jobs:
             ls -lah
             whoami
             env | sort
-            sudo pkg install -y devel/py-tox textproc/py-tomli
+            sudo pkg install -y shells/bash devel/py-tox textproc/py-tomli
             tox -e local-sudo-freebsd-standard
