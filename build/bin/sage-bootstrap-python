@@ -1,5 +1,5 @@
 #!/bin/sh
-
+set -x
 # Run the system python.
 #
 # This is only for use by the build toolchain.
