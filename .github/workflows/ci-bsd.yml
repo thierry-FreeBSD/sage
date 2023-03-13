@@ -35,10 +35,9 @@ jobs:
       - name: Test on ${{ matrix.os.name }}
         uses: cross-platform-actions/action@v0.10.0
         env:
-          MY_ENV1: MY_ENV1
-          MY_ENV2: MY_ENV2
+          PATH: /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/home/runner/bin
         with:
-          environment_variables: MY_ENV1 MY_ENV2
+          environment_variables: PATH
           operating_system: ${{ matrix.os.name }}
           architecture: ${{ matrix.os.architecture }}
           version: ${{ matrix.os.version }}
