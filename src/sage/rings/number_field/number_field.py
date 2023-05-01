@@ -114,7 +114,7 @@ import sage.libs.ntl.all as ntl
 import sage.interfaces.gap
 
 import sage.rings.complex_mpfr
-from sage.rings.polynomial.polynomial_element import is_Polynomial
+from sage.rings.polynomial.polynomial_element import Polynomial
 import sage.rings.real_mpfr
 import sage.rings.real_mpfi
 import sage.rings.complex_double
@@ -647,7 +647,7 @@ class NumberFieldFactory(UniqueFactory):
             raise TypeError("You must specify the name of the generator.")
         name = normalize_names(1, name)
 
-        if not is_Polynomial(polynomial):
+        if not isinstance(polynomial, Polynomial):
             try:
                 polynomial = polynomial.polynomial(QQ)
             except (AttributeError, TypeError):
@@ -868,7 +868,7 @@ def NumberFieldTower(polynomials, names, check=True, embeddings=None, latex_name
     f = polynomials[0]
     name = names[0]
     w = NumberFieldTower(polynomials[1:], names=names[1:], check=check, embeddings=embeddings[1:], latex_names=latex_names[1:], assume_disc_small=assume_disc_small, maximize_at_primes=maximize_at_primes, structures=structures[1:])
-    var = f.variable_name() if is_Polynomial(f) else 'x'
+    var = f.variable_name() if isinstance(f, Polynomial) else 'x'
 
     R = w[var]  # polynomial ring
     return w.extension(R(f), name, check=check, embedding=embeddings[0], structure=structures[0], latex_name=latex_names[0])  # currently, extension does not accept assume_disc_small, or maximize_at_primes
@@ -918,10 +918,10 @@ def QuadraticField(D, name='a', check=True, embedding=True, latex_name='sqrt', *
 
     ::
 
-        sage: from sage.rings.number_field.number_field import is_NumberField
+        sage: from sage.rings.number_field.number_field_base import NumberField
         sage: type(K)
         <class 'sage.rings.number_field.number_field.NumberField_quadratic_with_category'>
-        sage: is_NumberField(K)
+        sage: isinstance(K, NumberField)
         True
 
     Quadratic number fields are cached::
@@ -1382,7 +1382,7 @@ class NumberField_generic(WithEqualityById, number_field_base.NumberField):
     This example was suggested on sage-nt; see :trac:`18942`::
 
         sage: G = DirichletGroup(80)
-        sage: for chi in G:
+        sage: for chi in G:             # long time
         ....:     D = ModularSymbols(chi, 2, -1).cuspidal_subspace().new_subspace().decomposition()
         ....:     for f in D:
         ....:         elt = f.q_eigenform(10, 'alpha')[3]
@@ -1708,7 +1708,7 @@ class NumberField_generic(WithEqualityById, number_field_base.NumberField):
             a^2
 
         An error is raised when a PARI element with an incorrect
-        modulus is given:
+        modulus is given::
 
             sage: K(pari("Mod(-5/3*q^2 + 5/3*q - 1/6, q^3 - 999)"))
             Traceback (most recent call last):
@@ -8308,7 +8308,7 @@ class NumberField_absolute(NumberField_generic):
         if is_NumberFieldOrder(R) and self.has_coerce_map_from(R.number_field()):
             return self._generic_coerce_map(R)
         # R is not QQ by the above tests
-        if is_NumberField(R) and R.coerce_embedding() is not None:
+        if isinstance(R, number_field_base.NumberField) and R.coerce_embedding() is not None:
             if self.coerce_embedding() is not None:
                 try:
                     return number_field_morphisms.EmbeddedNumberFieldMorphism(R, self)
@@ -8693,8 +8693,8 @@ class NumberField_absolute(NumberField_generic):
             (Number Field in a0 with defining polynomial x^2 - 23 with a0 = -4.795831523312720?,
              -4.795831523312719)
 
-            If we take a different embedding of the large field, we get a
-            different embedding of the degree 2 subfield::
+        If we take a different embedding of the large field, we get a
+        different embedding of the degree 2 subfield::
 
             sage: K.<a> = NumberField(x^4 - 23, embedding=-50)
             sage: L2, _, _ = K.subfields(2)[0]; L2, CDF(L2.gen()) # indirect doctest
@@ -12153,7 +12153,7 @@ class NumberField_quadratic(NumberField_absolute, sage.rings.abc.NumberField_qua
         if D > 0:
             raise NotImplementedError("Hilbert class polynomial is not implemented for real quadratic fields.")
 
-        from sage.schemes.elliptic_curves.all import hilbert_class_polynomial as HCP
+        from sage.schemes.elliptic_curves.cm import hilbert_class_polynomial as HCP
         return QQ[name](HCP(D))
 
     def number_of_roots_of_unity(self):
@@ -12175,6 +12175,31 @@ class NumberField_quadratic(NumberField_absolute, sage.rings.abc.NumberField_qua
             return 6
         return 2
 
+    def order_of_conductor(self, f):
+        r"""
+        Return the unique order with the given conductor in this quadratic field.
+
+        .. SEEALSO ::
+
+            :meth:`sage.rings.number_field.order.Order.conductor`
+
+        EXAMPLES::
+
+            sage: K.<t> = QuadraticField(-123)
+            sage: K.order_of_conductor(1) is K.maximal_order()
+            True
+            sage: K.order_of_conductor(2).gens()
+            (1, t)
+            sage: K.order_of_conductor(44).gens()
+            (1, 22*t)
+            sage: K.order_of_conductor(9001).conductor()
+            9001
+        """
+        f = ZZ(f)
+        if f <= 0:
+            raise ValueError('conductor must be a positive integer')
+        return self.order([f * g for g in self.maximal_order().gens()])
+
 
 def is_fundamental_discriminant(D):
     r"""
@@ -12188,16 +12213,15 @@ def is_fundamental_discriminant(D):
     EXAMPLES::
 
         sage: [D for D in range(-15,15) if is_fundamental_discriminant(D)]
+        ...
+        DeprecationWarning: is_fundamental_discriminant(D) is deprecated; please use D.is_fundamental_discriminant()
+        ...
         [-15, -11, -8, -7, -4, -3, 5, 8, 12, 13]
         sage: [D for D in range(-15,15) if not is_square(D) and QuadraticField(D,'a').disc() == D]
         [-15, -11, -8, -7, -4, -3, 5, 8, 12, 13]
     """
-    d = D % 4
-    if d not in [0, 1]:
-        return False
-    return D != 1 and D != 0 and \
-        (arith.is_squarefree(D) or
-            (d == 0 and (D // 4) % 4 in [2, 3] and arith.is_squarefree(D // 4)))
+    deprecation(35147, "is_fundamental_discriminant(D) is deprecated; please use D.is_fundamental_discriminant()")
+    return Integer(D).is_fundamental_discriminant()
 
 
 ###################
@@ -12534,7 +12558,7 @@ def _splitting_classes_gens_(K, m, d):
             p = u.lift()
             while not p.is_prime():
                 p += m
-            f = R.ideal(p).prime_factors()[0].residue_class_degree()
+            f = K.fractional_ideal(p).prime_factors()[0].residue_class_degree()
             h = g**f
             if h not in H:
                 Hgens += [h]

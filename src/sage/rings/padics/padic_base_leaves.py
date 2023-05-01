@@ -904,7 +904,7 @@ class pAdicRingLattice(pAdicLatticeGeneric, pAdicRingBaseGeneric):
             True
 
         Note that coerce map does not exist between ``p``-adic rings with
-        lattice precision and other ``p``-adic rings.
+        lattice precision and other ``p``-adic rings. ::
 
             sage: S = Zp(2)
             sage: R.has_coerce_map_from(S)
@@ -913,7 +913,7 @@ class pAdicRingLattice(pAdicLatticeGeneric, pAdicRingBaseGeneric):
             False
 
         Similarly there is no coercion maps between ``p``-adic rings with
-        different labels.
+        different labels. ::
 
             sage: R2 = ZpLC(2, label='coerce')
             sage: R.has_coerce_map_from(R2)
@@ -1033,7 +1033,7 @@ class pAdicFieldLattice(pAdicLatticeGeneric, pAdicFieldBaseGeneric):
             True
 
         Note that coerce map does not exist between ``p``-adic fields with
-        lattice precision and other ``p``-adic rings.
+        lattice precision and other ``p``-adic rings. ::
 
             sage: L = Qp(2)
             sage: K.has_coerce_map_from(L)
@@ -1128,6 +1128,8 @@ class pAdicRingRelaxed(pAdicRelaxedGeneric, pAdicRingBaseGeneric):
 
             sage: R = ZpER(7)
             sage: TestSuite(R).run(skip=['_test_log', '_test_matrix_smith'])
+            sage: R = ZpER(7, secure=True)
+            sage: TestSuite(R).run(skip=['_test_log', '_test_matrix_smith'])
         """
         from sage.rings.padics import padic_relaxed_element
         self._default_prec, self._halting_prec, self._secure = prec
@@ -1162,6 +1164,8 @@ class pAdicFieldRelaxed(pAdicRelaxedGeneric, pAdicFieldBaseGeneric):
         TESTS::
 
             sage: K = QpER(7)
+            sage: TestSuite(K).run(skip=['_test_log', '_test_matrix_smith'])
+            sage: K = QpER(7, secure=True)
             sage: TestSuite(K).run(skip=['_test_log', '_test_matrix_smith'])
         """
         from sage.rings.padics import padic_relaxed_element

@@ -440,7 +440,6 @@ class pRational:
             return (self.__class__(self.p, (sx - sred)/(pd*ox), 0),
                     self.__class__(self.p, sred, sval, valuation=sval))
 
-
     def __lshift__(self, n):
         r"""
         Return the product of this element by ``p^n``.
@@ -974,7 +973,7 @@ class DifferentialPrecisionGeneric(SageObject):
             [   0 2048]
 
         If the precision module does not project to a lattice,
-        an error is raised.
+        an error is raised. ::
 
             sage: R = ZpLF(2, label='precision_lattice')
             sage: prec = R.precision()
@@ -1249,7 +1248,6 @@ class DifferentialPrecisionGeneric(SageObject):
             return s + "  " + status
         else:
             return status
-
 
     def history(self, compact=True, separate_reduce=False, timings=True, output_type='asciiart'):
         r"""
@@ -2689,7 +2687,7 @@ class PrecisionModule(UniqueRepresentation, DifferentialPrecisionGeneric):
             [   0 2048]
 
         If the precision module does not project to a lattice,
-        an error is raised.
+        an error is raised. ::
 
             sage: prec.precision_lattice([x, y, u, v])
             Traceback (most recent call last):

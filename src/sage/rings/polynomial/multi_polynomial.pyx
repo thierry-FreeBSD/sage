@@ -20,6 +20,9 @@ from itertools import chain, islice
 from sage.misc.misc_c import prod
 
 def is_MPolynomial(x):
+    from sage.misc.superseded import deprecation
+    deprecation(32709, "the function is_MPolynomial is deprecated; use isinstance(x, sage.structure.element.MPolynomial) instead")
+
     return isinstance(x, MPolynomial)
 
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
@@ -32,7 +35,7 @@ from sage.rings.real_mpfr import RealField_class, RealField
 from sage.rings.polynomial.polydict cimport ETuple
 from sage.rings.polynomial.polynomial_element cimport Polynomial
 
-cdef class MPolynomial(CommutativeRingElement):
+cdef class MPolynomial(CommutativePolynomial):
 
     ####################
     # Some standard conversions
@@ -235,9 +238,8 @@ cdef class MPolynomial(CommutativeRingElement):
 
         - Didier Deshommes
         """
-        degs = self.exponents()
         d = self.dict()
-        return  [ d[i] for i in degs ]
+        return [d[i] for i in self.exponents()]
 
     def truncate(self, var, n):
         """
@@ -1387,8 +1389,8 @@ cdef class MPolynomial(CommutativeRingElement):
         If both polynomials are of positive degree with respect to variable, the
         determinant of the Sylvester matrix is the resultant::
 
-            sage: f = R.random_element(4)
-            sage: g = R.random_element(4)
+            sage: f = R.random_element(4) or (x^2 * y^2)
+            sage: g = R.random_element(4) or (x^2 * y^2)
             sage: f.sylvester_matrix(g, x).determinant() == f.resultant(g, x)
             True
 
@@ -1589,7 +1591,7 @@ cdef class MPolynomial(CommutativeRingElement):
             x = variable
         p = self.polynomial(x)
         q = other.polynomial(x)
-        return [R(f) for f in  p.subresultants(q)]
+        return [R(f) for f in p.subresultants(q)]
 
     def macaulay_resultant(self, *args):
         r"""
@@ -2344,7 +2346,7 @@ cdef class MPolynomial(CommutativeRingElement):
             sage: F.reduced_form(prec=50, smallest_coeffs=False)
             Traceback (most recent call last):
             ...
-            ValueError: accuracy of Newton's root not within tolerance(0.0000124... > 1e-06), increase precision
+            ValueError: accuracy of Newton's root not within tolerance(0.000012... > 1e-06), increase precision
             sage: F.reduced_form(prec=100, smallest_coeffs=False)
             (
                                                                   [-1 -1]
@@ -2852,3 +2854,26 @@ cdef remove_from_tuple(e, int ind):
         return w[0]
     else:
         return tuple(w)
+
+
+cdef class MPolynomial_libsingular(MPolynomial):
+    r"""
+    Abstract base class for :class:`~sage.rings.polynomial.multi_polynomial_libsingular.MPolynomial_libsingular`
+
+    This class is defined for the purpose of :func:`isinstance` tests.  It should not be
+    instantiated.
+
+    EXAMPLES::
+
+        sage: R1.<x> = QQ[]
+        sage: isinstance(x, sage.rings.polynomial.multi_polynomial.MPolynomial_libsingular)
+        False
+        sage: R2.<y,z> = QQ[]
+        sage: isinstance(y, sage.rings.polynomial.multi_polynomial.MPolynomial_libsingular)
+        True
+
+    By design, there is a unique direct subclass::
+
+        sage: len(sage.rings.polynomial.multi_polynomial.MPolynomial_libsingular.__subclasses__()) <= 1
+        True
+    """

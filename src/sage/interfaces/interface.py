@@ -709,7 +709,6 @@ class InterfaceFunctionElement(SageObject):
         return M.help(self._name)
 
 
-
 def is_InterfaceElement(x):
     """
     Return True if ``x`` is of type :class:`InterfaceElement`.
@@ -880,7 +879,7 @@ class InterfaceElement(Element):
         `"'abc'"` instead. That is dependant on the Elements `is_string` function to
         be implemented correctly. This has gone wrong in the past and remained uncaught
         by the doctests because the original identifier was reused. This test makes sure
-        that does not happen again:
+        that does not happen again::
 
             sage: a = r("'abc'")                                                  # optional - rpy2
             sage: b = dumps(a)                                                    # optional - rpy2
@@ -1099,7 +1098,6 @@ class InterfaceElement(Element):
             return sage.misc.sage_eval.sage_eval(string)
         except Exception:
             raise NotImplementedError("Unable to parse output: %s" % string)
-
 
     def sage(self, *args, **kwds):
         """
