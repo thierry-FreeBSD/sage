@@ -41,7 +41,7 @@ jobs:
           operating_system: ${{ matrix.os.name }}
           architecture: ${{ matrix.os.architecture }}
           version: ${{ matrix.os.version }}
-          shell: bash {0}
+          shell: bash
           memory: 8G
           cpu_count: 4
           run: |
